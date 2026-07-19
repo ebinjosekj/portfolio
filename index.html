@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>Ebin Jose | Full Stack Developer</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+    :root {
+        --background: #111827;
+        --background-light: #172033;
+        --card: #1c2739;
+        --card-light: #243247;
+
+        --blue: #38bdf8;
+        --blue-dark: #0284c7;
+        --purple: #a78bfa;
+
+        --white: #f8fafc;
+        --text: #dbe4f0;
+        --muted: #94a3b8;
+
+        --border: rgba(148, 163, 184, 0.15);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--background);
+        color: var(--white);
+        line-height: 1.6;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .container {
+        width: min(1180px, 90%);
+        margin: auto;
+    }
+
+    /* NAVBAR */
+
+    nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+        background: rgba(17, 24, 39, 0.82);
+        backdrop-filter: blur(18px);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+        height: 76px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .logo span {
+        color: var(--blue);
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+        color: var(--muted);
+        font-size: 0.85rem;
+    }
+
+    .nav-links a {
+        transition: 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: var(--blue);
+    }
+
+    .nav-button {
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        color: var(--blue);
+        padding: 0.55rem 1rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        transition: 0.3s ease;
+    }
+
+    .nav-button:hover {
+        background: var(--blue);
+        color: var(--background);
+    }
+
+    /* HERO */
+
+    .hero {
+        min-height: 100vh;
+        padding: 150px 0 100px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::before {
+        content: "";
+        position: absolute;
+        width: 650px;
+        height: 650px;
+        right: -250px;
+        top: -200px;
+        background: radial-gradient(
+            circle,
+            rgba(56, 189, 248, 0.12),
+            transparent 68%
+        );
+        pointer-events: none;
+    }
+
+    .hero::after {
+        content: "";
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        left: -250px;
+        bottom: -250px;
+        background: radial-gradient(
+            circle,
+            rgba(167, 139, 250, 0.08),
+            transparent 68%
+        );
+        pointer-events: none;
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 5rem;
+        align-items: center;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .available {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.5rem 0.9rem;
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 50px;
+        color: var(--blue);
+        font-size: 0.72rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .available::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4ade80;
+        box-shadow: 0 0 10px #4ade80;
+    }
+
+    .hero h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: clamp(3.5rem, 7vw, 6.5rem);
+        line-height: 0.95;
+        letter-spacing: -5px;
+        margin-bottom: 1.8rem;
+    }
+
+    .hero h1 span {
+        color: var(--blue);
+    }
+
+    .hero h1 .outline {
+        color: transparent;
+        -webkit-text-stroke: 1px var(--muted);
+    }
+
+    .hero-description {
+        max-width: 570px;
+        color: var(--muted);
+        font-size: 1.05rem;
+        margin-bottom: 2.2rem;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .button {
+        padding: 0.85rem 1.3rem;
+        border-radius: 6px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: 0.3s ease;
+    }
+
+    .button-primary {
+        background: var(--blue);
+        color: #082f49;
+    }
+
+    .button-primary:hover {
+        background: #7dd3fc;
+        transform: translateY(-3px);
+    }
+
+    .button-secondary {
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    .button-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+    }
+
+    /* PHOTO */
+
+    .hero-photo {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        z-index: 2;
+    }
+
+    .photo-card {
+        width: 390px;
+        height: 500px;
+        position: relative;
+        border-radius: 18px;
+        overflow: hidden;
+        background: var(--card);
+        border: 1px solid var(--border);
+        box-shadow:
+            0 30px 70px rgba(0, 0, 0, 0.25),
+            0 0 60px rgba(56, 189, 248, 0.08);
+    }
+
+    .photo-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            135deg,
+            rgba(56, 189, 248, 0.12),
+            transparent 40%,
+            rgba(167, 139, 250, 0.12)
+        );
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .profile-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(0.75);
+        transition: 0.5s ease;
+    }
+
+    .photo-card:hover .profile-photo {
+        transform: scale(1.04);
+        filter: saturate(1);
+    }
+
+    .photo-tag {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        padding: 1rem;
+        background: rgba(17, 24, 39, 0.88);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        z-index: 3;
+    }
+
+    .photo-tag strong {
+        display: block;
+        font-family: 'Space Grotesk', sans-serif;
+        color: var(--blue);
+        font-size: 1.1rem;
+    }
+
+    .photo-tag span {
+        color: var(--muted);
+        font-size: 0.75rem;
+    }
+
+    .floating-card {
+        position: absolute;
+        right: -35px;
+        top: 55px;
+        padding: 1rem 1.2rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .floating-card strong {
+        display: block;
+        color: var(--purple);
+        font-size: 1.3rem;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .floating-card span {
+        color: var(--muted);
+        font-size: 0.7rem;
+    }
+
+    /* SECTION */
+
+    section {
+        padding: 110px 0;
+    }
+
+    .section-heading {
+        margin-bottom: 3.5rem;
+    }
+
+    .section-label {
+        color: var(--blue);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 0.8rem;
+    }
+
+    .section-heading h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 3rem;
+        letter-spacing: -2px;
+    }
+
+    .section-heading p {
+        color: var(--muted);
+        max-width: 520px;
+        margin-top: 0.8rem;
+    }
+
+    /* ABOUT */
+
+    .about {
+        background: var(--background-light);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+    }
+
+    .about-text {
+        color: var(--muted);
+        font-size: 0.95rem;
+    }
+
+    .about-text .intro {
+        color: var(--text);
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.65rem;
+        line-height: 1.35;
+        margin-bottom: 1.5rem;
+    }
+
+    .about-text p {
+        margin-bottom: 1rem;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .stat {
+        padding: 1.8rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: 0.3s ease;
+    }
+
+    .stat:hover {
+        border-color: rgba(56, 189, 248, 0.4);
+        transform: translateY(-4px);
+    }
+
+    .stat strong {
+        display: block;
+        font-family: 'Space Grotesk', sans-serif;
+        color: var(--blue);
+        font-size: 2.4rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .stat span {
+        color: var(--muted);
+        font-size: 0.78rem;
+    }
+
+    /* SKILLS */
+
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+
+    .skill-card {
+        padding: 1.7rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: 0.3s ease;
+    }
+
+    .skill-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(56, 189, 248, 0.4);
+        background: var(--card-light);
+    }
+
+    .skill-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(56, 189, 248, 0.1);
+        color: var(--blue);
+        font-weight: 700;
+        font-size: 0.8rem;
+        margin-bottom: 1.3rem;
+    }
+
+    .skill-card h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .skill-card p {
+        color: var(--muted);
+        font-size: 0.78rem;
+    }
+
+    /* EXPERIENCE */
+
+    .experience {
+        background: var(--background-light);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .timeline {
+        position: relative;
+        margin-left: 10px;
+    }
+
+    .timeline::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 10px;
+        bottom: 10px;
+        width: 1px;
+        background: var(--border);
+    }
+
+    .timeline-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 3rem;
+        padding: 0 0 3rem 2.5rem;
+    }
+
+    .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -5px;
+        top: 8px;
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--blue);
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.7);
+    }
+
+    .timeline-date {
+        color: var(--muted);
+        font-size: 0.75rem;
+        padding-top: 0.2rem;
+    }
+
+    .timeline-content {
+        padding: 1.8rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: 0.3s ease;
+    }
+
+    .timeline-content:hover {
+        border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .timeline-content h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.35rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .company {
+        color: var(--blue);
+        font-size: 0.82rem;
+        margin-bottom: 1rem;
+    }
+
+    .timeline-content ul {
+        padding-left: 1.2rem;
+        color: var(--muted);
+        font-size: 0.83rem;
+    }
+
+    .timeline-content li {
+        margin-bottom: 0.4rem;
+    }
+
+    /* PROJECTS */
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+    }
+
+    .project-card {
+        position: relative;
+        padding: 2rem;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: 0.3s ease;
+    }
+
+    .project-card::before {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        right: -80px;
+        top: -80px;
+        background: rgba(56, 189, 248, 0.1);
+        border-radius: 50%;
+        filter: blur(30px);
+    }
+
+    .project-card:hover {
+        transform: translateY(-7px);
+        border-color: rgba(56, 189, 248, 0.45);
+    }
+
+    .project-number {
+        color: var(--purple);
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .project-card h3 {
+        position: relative;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.25rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .project-card p {
+        position: relative;
+        color: var(--muted);
+        font-size: 0.82rem;
+    }
+
+    .tech {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .tech span {
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        background: rgba(56, 189, 248, 0.08);
+        color: var(--blue);
+        font-size: 0.65rem;
+    }
+
+    /* EDUCATION */
+
+    .education {
+        background: var(--background-light);
+        border-top: 1px solid var(--border);
+    }
+
+    .education-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .education-card {
+        padding: 2rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+    }
+
+    .education-card h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        margin-bottom: 0.4rem;
+    }
+
+    .education-card p {
+        color: var(--muted);
+        font-size: 0.85rem;
+    }
+
+    .education-date {
+        color: var(--blue) !important;
+        margin-top: 1rem;
+        font-size: 0.75rem !important;
+    }
+
+    /* CONTACT */
+
+    .contact {
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-box {
+        padding: 5rem 2rem;
+        background: linear-gradient(
+            135deg,
+            #172033,
+            #1c2739
+        );
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-box::before {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+            circle,
+            rgba(56, 189, 248, 0.12),
+            transparent 65%
+        );
+    }
+
+    .contact-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .contact h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: clamp(2.8rem, 6vw, 5rem);
+        letter-spacing: -3px;
+        line-height: 1;
+        margin-bottom: 1rem;
+    }
+
+    .contact h2 span {
+        color: var(--blue);
+    }
+
+    .contact p {
+        color: var(--muted);
+        max-width: 500px;
+        margin: 0 auto 1.8rem;
+    }
+
+    .email {
+        display: inline-block;
+        color: var(--blue);
+        font-size: 1.1rem;
+        margin-bottom: 1.8rem;
+        border-bottom: 1px solid var(--blue);
+    }
+
+    .socials {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+    }
+
+    .socials a:hover {
+        color: var(--blue);
+    }
+
+    /* FOOTER */
+
+    footer {
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 0;
+        color: var(--muted);
+        font-size: 0.7rem;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 950px) {
+
+        .hero-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-photo {
+            justify-content: flex-start;
+        }
+
+        .skills-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .projects-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+    }
+
+    @media (max-width: 650px) {
+
+        .nav-links,
+        .nav-button {
+            display: none;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            letter-spacing: -3px;
+        }
+
+        .photo-card {
+            width: 290px;
+            height: 380px;
+        }
+
+        .floating-card {
+            right: -10px;
+        }
+
+        .about-grid {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+
+        .skills-grid,
+        .projects-grid,
+        .education-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .timeline-item {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            padding-left: 2rem;
+        }
+
+        .section-heading h2 {
+            font-size: 2.3rem;
+        }
+
+        .contact h2 {
+            font-size: 3rem;
+        }
+
+        .footer-content {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<!-- NAVIGATION -->
+
+<nav>
+    <div class="container nav-container">
+
+        <a href="#home" class="logo">
+            E<span>J</span>.
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+        </ul>
+
+        <a href="#contact" class="nav-button">
+            Let's Talk
+        </a>
+
+    </div>
+</nav>
+
+<!-- HERO -->
+
+<header class="hero" id="home">
+
+    <div class="container hero-grid">
+
+        <div class="hero-content">
+
+            <div class="available">
+                Full Stack Developer
+            </div>
+
+            <h1>
+                BUILDING<br>
+                <span class="outline">DIGITAL</span><br>
+                <span>SOLUTIONS.</span>
+            </h1>
+
+            <p class="hero-description">
+                Hi, I'm <strong>Ebin Jose</strong> — a Full Stack Developer specializing in .NET, C#, Angular, React, and Azure. I build reliable and scalable software that solves real-world problems.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#experience" class="button button-primary">
+                    Explore My Work
+                </a>
+
+                <a href="mailto:ebinjosekj@gmail.com" class="button button-secondary">
+                    Get In Touch
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="hero-photo">
+
+            <div class="photo-card">
+
+                <img
+                    src="ebin-photo.jpeg"
+                    alt="Ebin Jose"
+                    class="profile-photo"
+                >
+
+                <div class="photo-tag">
+                    <strong>EBIN JOSE</strong>
+                    <span>Full Stack Developer · Canada</span>
+                </div>
+
+            </div>
+
+            <div class="floating-card">
+                <strong>5+</strong>
+                <span>Years Experience</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+<main>
+
+    <!-- ABOUT -->
+
+    <section class="about" id="about">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">01 / About Me</div>
+
+                <h2>More than just code.</h2>
+
+                <p>
+                    I enjoy turning complex problems into simple, reliable, and maintainable software.
+                </p>
+
+            </div>
+
+            <div class="about-grid">
+
+                <div class="about-text">
+
+                    <p class="intro">
+                        I'm a Full Stack Developer with over 5 years of experience building enterprise and web-based applications.
+                    </p>
+
+                    <p>
+                        My core expertise is in the .NET ecosystem, with hands-on experience across backend development, frontend technologies, databases, cloud platforms, and CI/CD.
+                    </p>
+
+                    <p>
+                        From municipal systems to enterprise insurance applications, I have worked on different types of software and collaborated with teams across the full development lifecycle.
+                    </p>
+
+                </div>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <strong>5+</strong>
+                        <span>Years of Experience</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong>10+</strong>
+                        <span>Core Technologies</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong>.NET</strong>
+                        <span>Primary Expertise</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong>∞</strong>
+                        <span>Learning Mindset</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- SKILLS -->
+
+    <section id="skills">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">02 / My Skills</div>
+
+                <h2>What I work with.</h2>
+
+                <p>
+                    A modern technology stack built around scalable application development.
+                </p>
+
+            </div>
+
+            <div class="skills-grid">
+
+                <div class="skill-card">
+                    <div class="skill-icon">BE</div>
+                    <h3>Backend</h3>
+                    <p>C#, .NET Core, ASP.NET MVC, Web API, Entity Framework</p>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-icon">FE</div>
+                    <h3>Frontend</h3>
+                    <p>Angular, React, JavaScript, HTML, CSS, jQuery</p>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-icon">DB</div>
+                    <h3>Databases</h3>
+                    <p>SQL Server, Azure SQL, PostgreSQL, Stored Procedures</p>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-icon">CL</div>
+                    <h3>Cloud</h3>
+                    <p>Azure, App Services, Azure Virtual Machines</p>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-icon">DV</div>
+                    <h3>DevOps</h3>
+                    <p>Azure DevOps, GitHub Actions, Jenkins, Docker</p>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-icon">SE</div>
+                    <h3>Security</h3>
+                    <p>OAuth, JWT, OAuth2, SSL/TLS, Azure AD</p>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-icon">QA</div>
+                    <h3>Testing</h3>
+                    <p>MSTest, NUnit, Unit Testing, Code Reviews</p>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-icon">AG</div>
+                    <h3>Agile</h3>
+                    <p>Scrum, JIRA, Git, TFS, Team Collaboration</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- EXPERIENCE -->
+
+    <section class="experience" id="experience">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">03 / Experience</div>
+
+                <h2>My professional journey.</h2>
+
+                <p>
+                    Experience across software development, enterprise applications, and full-stack engineering.
+                </p>
+
+            </div>
+
+            <div class="timeline">
+
+                <div class="timeline-item">
+
+                    <div class="timeline-date">
+                        MAR 2025 — PRESENT
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>Software Developer</h3>
+
+                        <div class="company">
+                            Xplore Inc. · Fredericton, NB
+                        </div>
+
+                        <ul>
+                            <li>Develop full-stack software solutions using .NET and C#.</li>
+                            <li>Integrate on-premise and cloud systems through SOAP and REST services.</li>
+                            <li>Collaborate with Development Leads, IT Leads, and Business Systems Analysts.</li>
+                            <li>Maintain QA, Test, and Staging environments.</li>
+                            <li>Perform root cause analysis and resolve technical incidents.</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <div class="timeline-item">
+
+                    <div class="timeline-date">
+                        JUN 2024 — OCT 2024
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>Programmer Analyst 1 — Intern</h3>
+
+                        <div class="company">
+                            City of Winnipeg · Manitoba
+                        </div>
+
+                        <ul>
+                            <li>Developed applications using .NET Core, C#, Angular, and Azure SQL.</li>
+                            <li>Worked on the Water and Waste Management System.</li>
+                            <li>Built RESTful APIs and implemented OAuth and JWT security.</li>
+                            <li>Used Entity Framework Code First for database management.</li>
+                            <li>Implemented CI/CD pipelines using Azure DevOps.</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <div class="timeline-item">
+
+                    <div class="timeline-date">
+                        JAN 2024 — JUN 2024
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>Technical Support Specialist</h3>
+
+                        <div class="company">
+                            Teleperformance · Waterloo, ON
+                        </div>
+
+                        <ul>
+                            <li>Provided technical support and troubleshooting assistance.</li>
+                            <li>Diagnosed technical issues and delivered effective solutions.</li>
+                            <li>Developed strong customer communication and problem-solving skills.</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <div class="timeline-item">
+
+                    <div class="timeline-date">
+                        OCT 2019 — APR 2022
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>Software Engineer</h3>
+
+                        <div class="company">
+                            Buck, A Gallagher Company · Kochi, India
+                        </div>
+
+                        <ul>
+                            <li>Developed enterprise applications using .NET MVC, C#, Razor, and Entity Framework.</li>
+                            <li>Implemented Single Sign-On using Azure Active Directory.</li>
+                            <li>Built internal insurance tools for plan revisions and data projections.</li>
+                            <li>Designed RESTful APIs and optimized SQL Server operations.</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <div class="timeline-item">
+
+                    <div class="timeline-date">
+                        JUL 2018 — SEP 2019
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>Software Engineer</h3>
+
+                        <div class="company">
+                            CCTS Global · Trivandrum, India
+                        </div>
+
+                        <ul>
+                            <li>Developed full-stack applications using Angular and .NET API.</li>
+                            <li>Implemented business logic using C# and OOP principles.</li>
+                            <li>Worked with Entity Framework and Microsoft SQL Server.</li>
+                            <li>Deployed applications using Azure App Services.</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- PROJECTS -->
+
+    <section id="projects">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">04 / Projects</div>
+
+                <h2>Selected work.</h2>
+
+                <p>
+                    Some of the systems and applications I've worked on.
+                </p>
+
+            </div>
+
+            <div class="projects-grid">
+
+                <div class="project-card">
+
+                    <div>
+                        <div class="project-number">PROJECT 01</div>
+
+                        <h3>Water & Waste Management System</h3>
+
+                        <p>
+                            A municipal system supporting water and waste management operations, reporting, and data tracking.
+                        </p>
+                    </div>
+
+                    <div class="tech">
+                        <span>Angular</span>
+                        <span>.NET Core</span>
+                        <span>Azure SQL</span>
+                    </div>
+
+                </div>
+
+                <div class="project-card">
+
+                    <div>
+                        <div class="project-number">PROJECT 02</div>
+
+                        <h3>Insurance Management Tool</h3>
+
+                        <p>
+                            An internal enterprise tool designed for insurance firms to manage plan revisions, updates, and projections.
+                        </p>
+                    </div>
+
+                    <div class="tech">
+                        <span>ASP.NET MVC</span>
+                        <span>C#</span>
+                        <span>SQL Server</span>
+                    </div>
+
+                </div>
+
+                <div class="project-card">
+
+                    <div>
+                        <div class="project-number">PROJECT 03</div>
+
+                        <h3>Customer-Vendor Platform</h3>
+
+                        <p>
+                            A full-stack platform connecting customers and vendors through a responsive web application.
+                        </p>
+                    </div>
+
+                    <div class="tech">
+                        <span>Angular</span>
+                        <span>.NET API</span>
+                        <span>Azure</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- EDUCATION -->
+
+    <section class="education">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">05 / Education</div>
+
+                <h2>The foundation.</h2>
+
+            </div>
+
+            <div class="education-grid">
+
+                <div class="education-card">
+
+                    <h3>Conestoga College</h3>
+
+                    <p>
+                        Post Graduate Diploma in Web Development
+                    </p>
+
+                    <p class="education-date">
+                        MAY 2022 — AUG 2023
+                    </p>
+
+                </div>
+
+                <div class="education-card">
+
+                    <h3>Mahatma Gandhi University</h3>
+
+                    <p>
+                        Bachelor of Technology in Computer Science
+                    </p>
+
+                    <p class="education-date">
+                        2014 — 2018
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- CONTACT -->
+
+    <section class="contact" id="contact">
+
+        <div class="container">
+
+            <div class="contact-box">
+
+                <div class="contact-content">
+
+                    <div class="section-label">
+                        06 / Contact
+                    </div>
+
+                    <h2>
+                        Let's build<br>
+                        <span>something great.</span>
+                    </h2>
+
+                    <p>
+                        Have an opportunity, project, or idea? I would love to hear from you.
+                    </p>
+
+                    <a href="mailto:ebinjosekj@gmail.com" class="email">
+                        ebinjosekj@gmail.com
+                    </a>
+
+                    <div class="socials">
+
+                        <a href="https://www.linkedin.com/in/joseebin" target="_blank">
+                            LinkedIn
+                        </a>
+
+                        <a href="mailto:ebinjosekj@gmail.com">
+                            Email
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <div class="container footer-content">
+
+        <span>© 2026 Ebin Jose</span>
+
+        <span>Full Stack Developer · Canada</span>
+
+    </div>
+
+</footer>
+```
+
+</body>
+</html>
