@@ -796,6 +796,21 @@ function initOffscreenPause() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Scroll position: start at the top, keep back/forward working         */
+/* ------------------------------------------------------------------ */
+function initScrollRestore() {
+  window.scrollTo(0, 0);
+  window.addEventListener('load', () => { if (!location.hash) window.scrollTo(0, 0); }, { once: true });
+  // Restoration is manual, so back/forward between in-page links is handled here
+  window.addEventListener('popstate', () => {
+    const id = location.hash.slice(1);
+    const target = id && document.getElementById(id);
+    if (target) target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    else window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Boot                                                                 */
 /* ------------------------------------------------------------------ */
 splitHeroTitle();
@@ -812,6 +827,7 @@ initMagnetic();
 initTilt();
 initParticles();
 
+initScrollRestore();
 initOffscreenPause();
 // Start compiling the 3D scene while the preloader runs, so the intro never stalls
 const scene = initHeroScene();
