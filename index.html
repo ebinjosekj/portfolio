@@ -35,6 +35,12 @@
   <script>
     (function (d) {
       d.classList.replace('no-js', 'js');
+      // Always open at the hero: ignore a stale #hash or remembered scroll position on load
+      try {
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
+      } catch (e) {}
+      window.scrollTo(0, 0);
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('reduce');
       try { if (sessionStorage.getItem('ej-visited')) d.classList.add('is-return'); } catch (e) {}
       // Safety net: if scripts fail to load, never leave content hidden
