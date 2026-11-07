@@ -278,13 +278,14 @@ function initCursor() {
   document.addEventListener('pointerover', (e) => { if (e.target.closest(hoverSel)) cursor.classList.add('is-hover'); });
   document.addEventListener('pointerout', (e) => { if (e.target.closest(hoverSel) && !e.relatedTarget?.closest?.(hoverSel)) cursor.classList.remove('is-hover'); });
 
+  let looping = false;
   const loop = () => {
-    rx = lerp(rx, mx, 0.18);
-    ry = lerp(ry, my, 0.18);
-    ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
-    requestAnimationFrame(loop);
+    rx = lerp(rx, mx, 0.22);
+    ry = lerp(ry, my, 0.22);
+    ring.style.transform = `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0)`;
+    if (Math.abs(rx - mx) > 0.3 || Math.abs(ry - my) > 0.3) requestAnimationFrame(loop); else looping = false;
   };
-  requestAnimationFrame(loop);
+  window.addEventListener('pointermove', () => { if (!looping) { looping = true; requestAnimationFrame(loop); } }, { passive: true });
 }
 
 function initMagnetic() {
@@ -292,15 +293,17 @@ function initMagnetic() {
   $$('[data-magnetic]').forEach((el) => {
     const strength = el.classList.contains('contact__email') ? 0.16 : 0.32;
     const inner = el.querySelector(':scope > span');
+    let r = null;
+    el.addEventListener('pointerenter', () => { el.style.transform = ''; r = el.getBoundingClientRect(); });
     el.addEventListener('pointermove', (e) => {
-      const r = el.getBoundingClientRect();
+      if (!r) r = el.getBoundingClientRect();
       const x = e.clientX - (r.left + r.width / 2);
       const y = e.clientY - (r.top + r.height / 2);
-      el.style.transition = 'transform .2s ease-out';
       el.style.transform = `translate3d(${x * strength}px, ${y * strength * 1.1}px, 0)`;
       if (inner) inner.style.transform = `translate3d(${x * 0.1}px, ${y * 0.1}px, 0)`;
     });
     el.addEventListener('pointerleave', () => {
+      r = null;
       el.style.transition = 'transform .7s cubic-bezier(.16,1,.3,1)';
       el.style.transform = '';
       if (inner) { inner.style.transition = 'transform .7s cubic-bezier(.16,1,.3,1)'; inner.style.transform = ''; }
@@ -326,8 +329,13 @@ function initTilt() {
     if (Math.abs(cx - tx) > 0.001 || Math.abs(cy - ty) > 0.001) raf = requestAnimationFrame(animate); else raf = 0;
   };
   const kick = () => { if (!raf) raf = requestAnimationFrame(animate); };
+  let r = box.getBoundingClientRect();
+  let dirty = false;
+  const markDirty = () => { dirty = true; };
+  window.addEventListener('scroll', markDirty, { passive: true });
+  window.addEventListener('resize', markDirty, { passive: true });
   window.addEventListener('pointermove', (e) => {
-    const r = box.getBoundingClientRect();
+    if (dirty) { r = box.getBoundingClientRect(); dirty = false; }
     if (r.bottom < 0 || r.top > window.innerHeight) return;
     tx = clamp((e.clientX - (r.left + r.width / 2)) / (r.width), -1, 1);
     ty = clamp((e.clientY - (r.top + r.height / 2)) / (r.height), -1, 1);
@@ -344,16 +352,16 @@ function initParticles() {
   if (!canvas || !hero) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-  const colors = ['79,140,255', '139,92,246', '54,214,232', '220,230,255'];
+  const colors = ['rgb(79,140,255)', 'rgb(139,92,246)', 'rgb(54,214,232)', 'rgb(220,230,255)'];
   let w, h, dpr, parts = [];
   const mouse = { x: 0, y: 0, cx: 0, cy: 0 };
 
   const build = () => {
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     w = canvas.clientWidth; h = canvas.clientHeight;
     canvas.width = w * dpr; canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const n = w < 760 ? 34 : 80;
+    const n = w < 760 ? 26 : 56;
     parts = Array.from({ length: n }, () => ({
       x: Math.random() * w, y: Math.random() * h,
       z: Math.random() * 0.9 + 0.1,
@@ -378,11 +386,10 @@ function initParticles() {
       }
       const px = p.x - mouse.cx * 24 * p.z;
       const py = p.y - mouse.cy * 18 * p.z;
-      const a = (0.25 + 0.55 * p.z) * (0.6 + 0.4 * Math.sin(t * 0.0015 + p.tw));
-      ctx.beginPath();
-      ctx.arc(px, py, p.r * (0.6 + p.z), 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.c},${a.toFixed(3)})`;
-      ctx.fill();
+      ctx.globalAlpha = (0.25 + 0.55 * p.z) * (0.6 + 0.4 * Math.sin(t * 0.0015 + p.tw));
+      ctx.fillStyle = p.c;
+      const sz = p.r * (0.6 + p.z) * 2;
+      ctx.fillRect(px, py, sz, sz);
     }
   };
 
@@ -414,9 +421,9 @@ async function initHeroScene() {
   if (lowPower) { fallback(); return; }
   try {
     const { initHeroGL } = await import('./hero-gl.js');
-    const ok = initHeroGL(canvas, { reduce, hero: $('#home') });
-    if (!ok) fallback();
     canvas.addEventListener('gl-fallback', fallback, { once: true });
+    const ok = await initHeroGL(canvas, { reduce, hero: $('#home') });
+    if (!ok) fallback();
   } catch (e) {
     fallback();
   }
@@ -477,23 +484,30 @@ function initTech() {
     });
   };
 
-  const clearLinks = () => { svg.innerHTML = ''; };
+  const pos = new Map(); // node -> {x, y} relative to stage centre
+  let lines = [];
+  const clearLinks = () => { svg.innerHTML = ''; lines = []; };
+  const updateLinks = () => {
+    if (!activeNode || !lines.length) return;
+    const c = size / 2;
+    const a = pos.get(activeNode) || { x: 0, y: 0 };
+    lines.forEach(({ el, node }) => {
+      const b = pos.get(node) || { x: 0, y: 0 };
+      el.setAttribute('x1', (c + a.x).toFixed(1)); el.setAttribute('y1', (c + a.y).toFixed(1));
+      el.setAttribute('x2', (c + b.x).toFixed(1)); el.setAttribute('y2', (c + b.y).toFixed(1));
+    });
+  };
   const drawLinks = () => {
     clearLinks();
     if (!activeNode || !desktopQuery.matches) return;
-    const sr = stage.getBoundingClientRect();
-    const a = activeNode.getBoundingClientRect();
-    const ax = a.left + a.width / 2 - sr.left;
-    const ay = a.top + a.height / 2 - sr.top;
     (activeNode.dataset.related || '').split(' ').forEach((id) => {
       const t = byId.get(id);
       if (!t) return;
-      const b = t.getBoundingClientRect();
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', ax); line.setAttribute('y1', ay);
-      line.setAttribute('x2', b.left + b.width / 2 - sr.left); line.setAttribute('y2', b.top + b.height / 2 - sr.top);
-      svg.appendChild(line);
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      svg.appendChild(el);
+      lines.push({ el, node: t });
     });
+    updateLinks();
   };
 
   const activate = (node) => {
@@ -575,9 +589,10 @@ function initTech() {
         const x = Math.cos(a) * ring.r * size;
         const y = Math.sin(a) * ring.r * size;
         li.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        pos.set(li.firstElementChild, { x, y });
       });
     });
-    if (activeNode) drawLinks();
+    updateLinks();
   };
   const measure = () => { size = stage.clientWidth; };
 
@@ -630,10 +645,13 @@ function initTimeline() {
     const summary = $('summary', d);
     const body = $('.job__body', d);
     let busy = false;
+    let sr = null;
+    summary.addEventListener('pointerenter', () => { sr = summary.getBoundingClientRect(); });
     summary.addEventListener('pointermove', (e) => {
-      const r = summary.getBoundingClientRect();
-      summary.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      if (!sr) sr = summary.getBoundingClientRect();
+      summary.style.setProperty('--mx', `${e.clientX - sr.left}px`);
     });
+    summary.addEventListener('pointerleave', () => { sr = null; });
     if (reduce || !body.animate) return;
     summary.addEventListener('click', (e) => {
       e.preventDefault();
@@ -668,24 +686,36 @@ function initWorks() {
     const preview = $('.work__preview', work);
 
     if (finePointer && !reduce) {
+      let pr = null;
       preview.addEventListener('pointerenter', (e) => {
         const r = preview.getBoundingClientRect();
+        pr = r;
         const x = (e.clientX - r.left) / r.width - 0.5;
         const y = (e.clientY - r.top) / r.height - 0.5;
         // Gradient starts from the edge the pointer entered through
         const deg = Math.abs(x) > Math.abs(y) ? (x < 0 ? 90 : 270) : (y < 0 ? 180 : 0);
         preview.style.setProperty('--hd', `${deg}deg`);
       });
+      let pending = null;
       preview.addEventListener('pointermove', (e) => {
-        const r = preview.getBoundingClientRect();
-        const x = e.clientX - r.left;
-        const y = e.clientY - r.top;
+        if (!pr) pr = preview.getBoundingClientRect();
+        const ev = { x: e.clientX, y: e.clientY };
+        if (pending) { pending = ev; return; }
+        pending = ev;
+        requestAnimationFrame(() => {
+        const r = pr;
+        const x = pending.x - r.left;
+        const y = pending.y - r.top;
+        pending = null;
         preview.style.setProperty('--gx', `${x}px`);
         preview.style.setProperty('--gy', `${y}px`);
         preview.style.setProperty('--ry', `${((x / r.width) - 0.5) * 6}deg`);
         preview.style.setProperty('--rx', `${-((y / r.height) - 0.5) * 5}deg`);
+        });
       });
+      window.addEventListener('scroll', () => { pr = null; }, { passive: true });
       preview.addEventListener('pointerleave', () => {
+        pr = null;
         preview.style.setProperty('--rx', '0deg');
         preview.style.setProperty('--ry', '0deg');
       });
@@ -755,6 +785,17 @@ function initCopy() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Pause CSS loops in sections that are off-screen                      */
+/* ------------------------------------------------------------------ */
+function initOffscreenPause() {
+  if (reduce || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => e.target.classList.toggle('is-offscreen', !e.isIntersecting));
+  }, { rootMargin: '150px 0px' });
+  $$('.hero, .section, .ambient').forEach((el) => io.observe(el));
+}
+
+/* ------------------------------------------------------------------ */
 /* Boot                                                                 */
 /* ------------------------------------------------------------------ */
 splitHeroTitle();
@@ -771,7 +812,12 @@ initMagnetic();
 initTilt();
 initParticles();
 
-runPreloader().then(() => {
-  root.classList.add('is-ready');
-  initHeroScene();
+initOffscreenPause();
+// Start compiling the 3D scene while the preloader runs, so the intro never stalls
+const scene = initHeroScene();
+Promise.all([runPreloader(), Promise.race([scene, new Promise((r) => setTimeout(r, 1500))])]).then(() => {
+  requestAnimationFrame(() => {
+    root.classList.add('is-ready');
+    setTimeout(() => root.classList.add('is-settled'), 2600);
+  });
 });
