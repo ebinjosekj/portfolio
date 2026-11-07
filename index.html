@@ -96,6 +96,7 @@
   <!-- NAVIGATION -->
   <header class="nav" data-nav>
     <div class="nav__bar">
+      <span class="nav__progress" aria-hidden="true"></span>
       <a href="#home" class="nav__logo" aria-label="Ebin Jose, back to top">
         <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">
           <defs><linearGradient id="nav-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4F8CFF"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>
@@ -147,7 +148,7 @@
       <div class="hero__vignette"></div>
     </div>
 
-    <div class="hero__content shell">
+    <div class="hero__content shell" data-hero-content>
       <p class="hero__role" data-intro="1">Full Stack Developer</p>
       <h1 class="hero__title" id="hero-title" data-split>
         <span class="line">Building</span>
@@ -177,12 +178,17 @@
 
   <main id="main">
 
+  <section class="ticker" aria-label="Technologies and focus areas">
+    <div class="ticker__row ticker__row--icons"><ul class="ticker__track"><li><img src="assets/icons/csharp.svg" alt="" width="28" height="28" loading="lazy"><span>C#</span></li><li><img src="assets/icons/dotnetcore.svg" alt="" width="28" height="28" loading="lazy"><span>.NET Core</span></li><li><img src="assets/icons/angular.svg" alt="" width="28" height="28" loading="lazy"><span>Angular</span></li><li><img src="assets/icons/react.svg" alt="" width="28" height="28" loading="lazy"><span>React</span></li><li><img src="assets/icons/azure.svg" alt="" width="28" height="28" loading="lazy"><span>Microsoft Azure</span></li><li><img src="assets/icons/microsoftsqlserver.svg" alt="" width="28" height="28" loading="lazy"><span>SQL Server</span></li><li><img src="assets/icons/azuredevops.svg" alt="" width="28" height="28" loading="lazy"><span>Azure DevOps</span></li><li><img src="assets/icons/docker.svg" alt="" width="28" height="28" loading="lazy"><span>Docker</span></li><li><img src="assets/icons/githubactions.svg" alt="" width="28" height="28" loading="lazy"><span>GitHub Actions</span></li><li><img src="assets/icons/javascript.svg" alt="" width="28" height="28" loading="lazy"><span>JavaScript</span></li><li><img src="assets/icons/postgresql.svg" alt="" width="28" height="28" loading="lazy"><span>PostgreSQL</span></li><li><img src="assets/icons/git.svg" alt="" width="28" height="28" loading="lazy"><span>Git</span></li></ul><ul class="ticker__track" aria-hidden="true"><li><img src="assets/icons/csharp.svg" alt="" width="28" height="28" loading="lazy"><span>C#</span></li><li><img src="assets/icons/dotnetcore.svg" alt="" width="28" height="28" loading="lazy"><span>.NET Core</span></li><li><img src="assets/icons/angular.svg" alt="" width="28" height="28" loading="lazy"><span>Angular</span></li><li><img src="assets/icons/react.svg" alt="" width="28" height="28" loading="lazy"><span>React</span></li><li><img src="assets/icons/azure.svg" alt="" width="28" height="28" loading="lazy"><span>Microsoft Azure</span></li><li><img src="assets/icons/microsoftsqlserver.svg" alt="" width="28" height="28" loading="lazy"><span>SQL Server</span></li><li><img src="assets/icons/azuredevops.svg" alt="" width="28" height="28" loading="lazy"><span>Azure DevOps</span></li><li><img src="assets/icons/docker.svg" alt="" width="28" height="28" loading="lazy"><span>Docker</span></li><li><img src="assets/icons/githubactions.svg" alt="" width="28" height="28" loading="lazy"><span>GitHub Actions</span></li><li><img src="assets/icons/javascript.svg" alt="" width="28" height="28" loading="lazy"><span>JavaScript</span></li><li><img src="assets/icons/postgresql.svg" alt="" width="28" height="28" loading="lazy"><span>PostgreSQL</span></li><li><img src="assets/icons/git.svg" alt="" width="28" height="28" loading="lazy"><span>Git</span></li></ul></div>
+    <div class="ticker__row ticker__row--words"><ul class="ticker__track"><li><span>Full Stack Development</span><i aria-hidden="true">✦</i></li><li><span>Enterprise Applications</span><i aria-hidden="true">✦</i></li><li><span>REST APIs</span><i aria-hidden="true">✦</i></li><li><span>Cloud Deployments</span><i aria-hidden="true">✦</i></li><li><span>CI/CD Pipelines</span><i aria-hidden="true">✦</i></li><li><span>Secure Authentication</span><i aria-hidden="true">✦</i></li><li><span>Clean Architecture</span><i aria-hidden="true">✦</i></li><li><span>Agile Delivery</span><i aria-hidden="true">✦</i></li></ul><ul class="ticker__track" aria-hidden="true"><li><span>Full Stack Development</span><i aria-hidden="true">✦</i></li><li><span>Enterprise Applications</span><i aria-hidden="true">✦</i></li><li><span>REST APIs</span><i aria-hidden="true">✦</i></li><li><span>Cloud Deployments</span><i aria-hidden="true">✦</i></li><li><span>CI/CD Pipelines</span><i aria-hidden="true">✦</i></li><li><span>Secure Authentication</span><i aria-hidden="true">✦</i></li><li><span>Clean Architecture</span><i aria-hidden="true">✦</i></li><li><span>Agile Delivery</span><i aria-hidden="true">✦</i></li></ul></div>
+  </section>
+
     <!-- ABOUT -->
     <section class="section about" id="about" aria-labelledby="about-title">
       <div class="shell about__grid">
         <div class="about__text">
           <h2 class="heading" id="about-title" data-reveal="heading">More than<br>just code.</h2>
-          <p class="about__intro" data-reveal>
+          <p class="about__intro" data-words>
             I’m a Full Stack Developer with over 5 years of experience building enterprise and web-based applications.
           </p>
           <p data-reveal>
@@ -195,25 +201,22 @@
           </p>
         </div>
 
-        <div class="about__visual" data-tilt aria-hidden="true">
-          <div class="portrait">
+        <div class="about__visual" data-tilt data-reveal aria-hidden="true">
+          <div class="portrait" data-portrait>
             <picture>
               <source type="image/webp" srcset="assets/img/ebin-portrait-720.webp 720w, assets/img/ebin-portrait-1080.webp 1080w" sizes="(max-width: 860px) 80vw, 420px">
               <img src="assets/img/ebin-portrait-720.jpg" srcset="assets/img/ebin-portrait-720.jpg 720w, assets/img/ebin-portrait-1080.jpg 1080w" sizes="(max-width: 860px) 80vw, 420px" width="720" height="994" alt="" loading="lazy" decoding="async">
             </picture>
           </div>
-          <pre class="code-frag code-frag--a" data-depth="1.6"><code><span class="k">public class</span> <span class="t">Developer</span>
-{
-  <span class="k">public</span> <span class="t">string</span> Name =&gt; <span class="s">"Ebin Jose"</span>;
-  <span class="k">public</span> <span class="t">string</span>[] Stack =&gt;
-    [<span class="s">".NET"</span>, <span class="s">"Angular"</span>, <span class="s">"Azure"</span>];
-}</code></pre>
-          <pre class="code-frag code-frag--b" data-depth="2.4"><code>app.<span class="f">MapGet</span>(<span class="s">"/api/solutions"</span>,
-  <span class="k">async</span> (<span class="t">IService</span> s) =&gt;
-    <span class="k">await</span> s.<span class="f">BuildAsync</span>());</code></pre>
-          <div class="chip-float chip-float--1" data-depth="3"><img src="assets/icons/csharp.svg" alt="" width="22" height="22" loading="lazy">C#</div>
-          <div class="chip-float chip-float--2" data-depth="2"><img src="assets/icons/angular.svg" alt="" width="22" height="22" loading="lazy">Angular</div>
-          <div class="chip-float chip-float--3" data-depth="2.8"><img src="assets/icons/azure.svg" alt="" width="22" height="22" loading="lazy">Azure</div>
+          <span class="portrait__scan" aria-hidden="true"></span>
+          <ul class="orbit" data-orbit>
+            <li><img src="assets/icons/csharp.svg" alt="" width="22" height="22" loading="lazy">C#</li>
+            <li><img src="assets/icons/dotnetcore.svg" alt="" width="22" height="22" loading="lazy">.NET</li>
+            <li><img src="assets/icons/angular.svg" alt="" width="22" height="22" loading="lazy">Angular</li>
+            <li><img src="assets/icons/azure.svg" alt="" width="22" height="22" loading="lazy">Azure</li>
+            <li><img src="assets/icons/react.svg" alt="" width="22" height="22" loading="lazy">React</li>
+            <li><img src="assets/icons/microsoftsqlserver.svg" alt="" width="22" height="22" loading="lazy">SQL Server</li>
+          </ul>
         </div>
       </div>
 
@@ -266,7 +269,7 @@
           </aside>
         </div>
 
-        <div class="tech__stage" data-tech-stage>
+        <div class="tech__stage" data-tech-stage data-burst>
             <div class="tech__rings" aria-hidden="true"><i></i><i></i><i></i></div>
             <div class="tech__core" aria-hidden="true"><span>.NET</span><small>core ecosystem</small></div>
             <svg class="tech__links" aria-hidden="true"></svg>
@@ -326,10 +329,11 @@
       <div class="shell">
         <h2 class="heading" id="experience-title" data-reveal="heading">My professional<br>journey.</h2>
       </div>
+      <div class="year-counter" aria-hidden="true" data-year-counter><span class="year-counter__label">Now viewing</span><span class="year-counter__value" data-year-value>2025</span></div>
       <ol class="shell timeline" data-timeline>
         <li class="timeline__progress" aria-hidden="true"><span></span></li>
 
-        <li class="job" data-reveal>
+        <li class="job" data-year="2025" data-reveal>
           <details open>
             <summary>
               <span class="job__node" aria-hidden="true"></span>
@@ -351,7 +355,7 @@
           </details>
         </li>
 
-        <li class="job" data-reveal>
+        <li class="job" data-year="2024" data-reveal>
           <details>
             <summary>
               <span class="job__node" aria-hidden="true"></span>
@@ -373,7 +377,7 @@
           </details>
         </li>
 
-        <li class="job" data-reveal>
+        <li class="job" data-year="2024" data-reveal>
           <details>
             <summary>
               <span class="job__node" aria-hidden="true"></span>
@@ -393,7 +397,7 @@
           </details>
         </li>
 
-        <li class="job" data-reveal>
+        <li class="job" data-year="2019" data-reveal>
           <details>
             <summary>
               <span class="job__node" aria-hidden="true"></span>
@@ -414,7 +418,7 @@
           </details>
         </li>
 
-        <li class="job" data-reveal>
+        <li class="job" data-year="2018" data-reveal>
           <details>
             <summary>
               <span class="job__node" aria-hidden="true"></span>
@@ -450,7 +454,8 @@
       <div class="shell works">
         <!-- PROJECT 01 -->
         <article class="work" data-work data-reveal>
-          <div class="work__preview" data-hover-dir>
+          <span class="work__ghost" aria-hidden="true" data-parallax="-0.18">01</span>
+          <div class="work__preview" data-hover-dir data-tilt-in>
             <span class="work__glow" aria-hidden="true"></span>
             <div class="mock mock--water" aria-hidden="true">
               <div class="mock__top"><i></i><i></i><i></i><b></b></div>
@@ -493,7 +498,8 @@
 
         <!-- PROJECT 02 -->
         <article class="work work--flip" data-work data-reveal>
-          <div class="work__preview" data-hover-dir>
+          <span class="work__ghost" aria-hidden="true" data-parallax="-0.18">02</span>
+          <div class="work__preview" data-hover-dir data-tilt-in>
             <span class="work__glow" aria-hidden="true"></span>
             <div class="mock mock--insurance" aria-hidden="true">
               <div class="mock__top"><i></i><i></i><i></i><b></b></div>
@@ -531,7 +537,8 @@
 
         <!-- PROJECT 03 -->
         <article class="work" data-work data-reveal>
-          <div class="work__preview" data-hover-dir>
+          <span class="work__ghost" aria-hidden="true" data-parallax="-0.18">03</span>
+          <div class="work__preview" data-hover-dir data-tilt-in>
             <span class="work__glow" aria-hidden="true"></span>
             <div class="mock mock--market" aria-hidden="true">
               <div class="mock__top"><i></i><i></i><i></i><b></b></div>
@@ -572,11 +579,13 @@
         <h2 class="heading heading--md" id="education-title" data-reveal="heading">The<br>foundation.</h2>
         <ol class="edu__list">
           <li class="edu__item" data-reveal>
+            <span class="edu__ghost" aria-hidden="true" data-parallax="-0.12">2023</span>
             <p class="edu__years"><time datetime="2022-05">May 2022</time> – <time datetime="2023-08">Aug 2023</time></p>
             <h3 class="edu__school">Conestoga College</h3>
             <p class="edu__program">Post Graduate Diploma in Web Development</p>
           </li>
           <li class="edu__item" data-reveal>
+            <span class="edu__ghost" aria-hidden="true" data-parallax="-0.12">2018</span>
             <p class="edu__years"><time datetime="2014">2014</time> – <time datetime="2018">2018</time></p>
             <h3 class="edu__school">Mahatma Gandhi University</h3>
             <p class="edu__program">Bachelor of Technology in Computer Science</p>
@@ -587,12 +596,13 @@
 
     <!-- CONTACT -->
     <section class="section contact" id="contact" aria-labelledby="contact-title">
+      <div class="contact__marquee" aria-hidden="true"><div class="contact__marquee-track"><span>Let’s build something great</span><i>✦</i><span>Let’s build something great</span><i>✦</i></div><div class="contact__marquee-track"><span>Let’s build something great</span><i>✦</i><span>Let’s build something great</span><i>✦</i></div></div>
       <div class="contact__bg" aria-hidden="true">
+        <span class="contact__spot" data-spot></span>
         <span class="contact__light contact__light--a"></span>
         <span class="contact__light contact__light--b"></span>
-        <span class="contact__shape contact__shape--ring"></span>
-        <span class="contact__shape contact__shape--orb"></span>
-        <span class="contact__shape contact__shape--cube"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="contact__shape contact__shape--ring" data-depth="1.5"></span>
+        <span class="contact__shape contact__shape--orb" data-depth="2.5"></span>
       </div>
       <div class="shell contact__inner">
         <h2 class="contact__title" id="contact-title" data-reveal="heading">Let’s build<br>something great.</h2>
