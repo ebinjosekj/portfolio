@@ -577,6 +577,13 @@ function initTech() {
   let angle = 0;
   let size = 0;
   let hovering = false;
+  let burstStart = 0;
+  let spread = reduce || !stage.hasAttribute('data-burst') ? 1 : 0;
+  const ringSpread = (ri) => {
+    if (spread >= 1) return 1;
+    const t = clamp(spread * 1.6 - ri * 0.3, 0, 1);
+    return 1 - Math.pow(1 - t, 4) + Math.sin(t * Math.PI) * 0.06;
+  };
   let running = false;
   let raf = 0;
   let last = 0;
@@ -586,8 +593,9 @@ function initTech() {
       const n = ring.items.length;
       ring.items.forEach((li, i) => {
         const a = (i / n) * Math.PI * 2 + angle * ring.speed * 10 + ri * 0.6;
-        const x = Math.cos(a) * ring.r * size;
-        const y = Math.sin(a) * ring.r * size;
+        const k = ringSpread(ri);
+        const x = Math.cos(a) * ring.r * size * k;
+        const y = Math.sin(a) * ring.r * size * k;
         li.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
         pos.set(li.firstElementChild, { x, y });
       });
@@ -599,7 +607,12 @@ function initTech() {
   const loop = (t) => {
     const dt = last ? Math.min((t - last) / 1000, 0.05) : 0;
     last = t;
-    if (!hovering) { angle += dt; place(); }
+    if (spread < 1) {
+      if (!burstStart) { if (!stage.dataset.burstGo) { raf = requestAnimationFrame(loop); place(); return; } burstStart = t; }
+      spread = Math.min(1, (t - burstStart) / 1800);
+      angle += dt * (1 + (1 - spread) * 3);
+      place();
+    } else if (!hovering) { angle += dt; place(); }
     raf = requestAnimationFrame(loop);
   };
   const start = () => { if (running || reduce || !desktopQuery.matches) return; running = true; last = 0; raf = requestAnimationFrame(loop); };
@@ -616,6 +629,7 @@ function initTech() {
 
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([e]) => { if (e.isIntersecting) setMode(); else stop(); }, { rootMargin: '100px' }).observe(stage);
+    new IntersectionObserver(([e], obs) => { if (e.isIntersecting) { stage.dataset.burstGo = '1'; obs.disconnect(); } }, { threshold: 0.35 }).observe(stage);
   } else setMode();
   desktopQuery.addEventListener('change', setMode);
   window.addEventListener('resize', () => { if (desktopQuery.matches) { measure(); place(); } }, { passive: true });
@@ -792,7 +806,7 @@ function initOffscreenPause() {
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => e.target.classList.toggle('is-offscreen', !e.isIntersecting));
   }, { rootMargin: '150px 0px' });
-  $$('.hero, .section, .ambient').forEach((el) => io.observe(el));
+  $$('.hero, .section, .ambient, .ticker').forEach((el) => io.observe(el));
 }
 
 /* ------------------------------------------------------------------ */
@@ -810,11 +824,186 @@ function initScrollRestore() {
   });
 }
 
+
+/* ------------------------------------------------------------------ */
+/* Signature moments: one scroll loop, reads first then writes          */
+/* ------------------------------------------------------------------ */
+function splitWords() {
+  $$('[data-words]').forEach((p) => {
+    p.innerHTML = p.textContent.trim().split(/\s+/).map((w) => `<span class="w">${w}</span>`).join(' ');
+  });
+}
+
+function buildYearCounter() {
+  const el = $('[data-year-value]');
+  if (!el) return null;
+  const col = Array.from({ length: 10 }, (_, i) => i).join('<br>');
+  el.innerHTML = [...'0000'].map(() => `<span class="d"><span>${col}</span></span>`).join('');
+  const digits = $$('.d > span', el);
+  let current = '';
+  return (year) => {
+    if (year === current) return;
+    current = year;
+    [...year].forEach((ch, i) => { digits[i].style.transform = `translate3d(0, ${-Number(ch) * 1.1}em, 0)`; });
+  };
+}
+
+function initScrollScenes() {
+  const nav = $('[data-nav]');
+  const hero = $('#home');
+  const heroContent = $('[data-hero-content]');
+  const tilts = $$('[data-tilt-in]');
+  const parallax = $$('[data-parallax]');
+  const words = $('[data-words]');
+  const wordEls = words ? $$('.w', words) : [];
+  const jobs = $$('.job[data-year]');
+  const setYear = buildYearCounter();
+  let lastLit = -1;
+  let ticking = false;
+
+  const update = () => {
+    ticking = false;
+    const vh = window.innerHeight;
+    const sy = window.scrollY;
+    const max = document.documentElement.scrollHeight - vh;
+
+    // ---- reads
+    const heroH = hero ? hero.offsetHeight : 1;
+    const tiltR = tilts.map((el) => el.getBoundingClientRect());
+    const parR = parallax.map((el) => el.parentElement.getBoundingClientRect());
+    const wordR = words ? words.getBoundingClientRect() : null;
+    const jobTops = jobs.map((j) => j.getBoundingClientRect().top);
+
+    // ---- writes
+    nav?.style.setProperty('--sp', (max > 0 ? sy / max : 0).toFixed(4));
+
+    if (heroContent && !reduce) {
+      const p = clamp(sy / heroH, 0, 1);
+      if (p < 1) {
+        heroContent.style.transform = `translate3d(0, ${(-p * 140).toFixed(1)}px, 0)`;
+        heroContent.style.opacity = (1 - p * 1.4).toFixed(3);
+      }
+    }
+
+    if (!reduce) {
+      tilts.forEach((el, i) => {
+        const p = clamp((vh - tiltR[i].top) / (vh * 0.7), 0, 1);
+        el.style.setProperty('--tp', p.toFixed(3));
+      });
+      parallax.forEach((el, i) => {
+        const r = parR[i];
+        if (r.bottom < -vh * 0.5 || r.top > vh * 1.5) return;
+        const offset = clamp((r.top + r.height / 2 - vh / 2) * Number(el.dataset.parallax), -140, 140);
+        el.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
+      });
+    }
+
+    if (wordR && wordEls.length) {
+      const p = reduce ? 1 : clamp((vh * 0.82 - wordR.top) / (wordR.height + vh * 0.3), 0, 1);
+      const lit = Math.round(p * wordEls.length);
+      if (lit !== lastLit) {
+        wordEls.forEach((w, i) => w.classList.toggle('is-lit', i < lit));
+        lastLit = lit;
+      }
+    }
+
+    if (setYear && jobs.length) {
+      let idx = 0;
+      jobTops.forEach((t, i) => { if (t < vh * 0.55) idx = i; });
+      setYear(jobs[idx].dataset.year);
+      jobs.forEach((j, i) => j.classList.toggle('is-current', i === idx && jobTops[0] < vh * 0.8));
+    }
+  };
+
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
+}
+
+function initOrbit() {
+  const orbit = $('[data-orbit]');
+  if (!orbit) return;
+  const box = orbit.parentElement;
+  const chips = $$('li', orbit);
+  let angle = 0;
+  let w = 0, h = 0;
+  const measure = () => { w = box.clientWidth; h = box.clientHeight; };
+  const tilt = (-8 * Math.PI) / 180;
+  const place = () => {
+    const rx = Math.min(w * 0.54, window.innerWidth / 2 - 70);
+    const ry = h * 0.14;
+    chips.forEach((c, i) => {
+      const a = angle + (i / chips.length) * Math.PI * 2;
+      const ex = Math.cos(a) * rx;
+      const ey = Math.sin(a) * ry;
+      const x = ex * Math.cos(tilt) - ey * Math.sin(tilt);
+      const y = ex * Math.sin(tilt) + ey * Math.cos(tilt);
+      const depth = Math.sin(a); // >0: in front of the portrait
+      const s = 0.82 + (depth + 1) * 0.12;
+      c.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%) scale(${s.toFixed(3)})`;
+      c.style.opacity = (0.45 + (depth + 1) * 0.275).toFixed(3);
+      c.style.zIndex = depth > 0 ? 3 : 1;
+    });
+  };
+  measure();
+  place();
+  if (reduce) return;
+  let running = false, raf = 0, last = 0;
+  const loop = (t) => {
+    const dt = last ? Math.min((t - last) / 1000, 0.05) : 0;
+    last = t;
+    angle += dt * 0.35;
+    place();
+    raf = requestAnimationFrame(loop);
+  };
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !running) { running = true; last = 0; raf = requestAnimationFrame(loop); }
+    else if (!e.isIntersecting && running) { running = false; cancelAnimationFrame(raf); }
+  }, { rootMargin: '80px' }).observe(box);
+  window.addEventListener('resize', () => { measure(); place(); }, { passive: true });
+}
+
+function initSpotlights() {
+  if (!finePointer || reduce) return;
+  const stats = $$('.stat');
+  let rects = null;
+  const statsWrap = $('.stats');
+  statsWrap?.addEventListener('pointerenter', () => { rects = stats.map((s) => s.getBoundingClientRect()); });
+  statsWrap?.addEventListener('pointermove', (e) => {
+    if (!rects) rects = stats.map((s) => s.getBoundingClientRect());
+    stats.forEach((s, i) => {
+      s.style.setProperty('--sx', `${e.clientX - rects[i].left}px`);
+      s.style.setProperty('--sy', `${e.clientY - rects[i].top}px`);
+    });
+  });
+  statsWrap?.addEventListener('pointerleave', () => { rects = null; stats.forEach((s) => s.style.setProperty('--sx', '-300px')); });
+
+  const contact = $('#contact');
+  const spot = $('[data-spot]');
+  const shapes = $$('.contact__shape[data-depth]');
+  if (!contact || !spot) return;
+  let cr = null;
+  contact.addEventListener('pointerenter', () => { cr = contact.getBoundingClientRect(); });
+  contact.addEventListener('pointermove', (e) => {
+    if (!cr) cr = contact.getBoundingClientRect();
+    const x = e.clientX - cr.left;
+    const y = e.clientY - cr.top;
+    spot.style.setProperty('--cx', `${x}px`);
+    spot.style.setProperty('--cy', `${y}px`);
+    const nx = x / cr.width - 0.5, ny = y / cr.height - 0.5;
+    shapes.forEach((sh) => { const d = Number(sh.dataset.depth); sh.style.translate = `${(nx * d * 24).toFixed(1)}px ${(ny * d * 24).toFixed(1)}px`; });
+  });
+  contact.addEventListener('pointerleave', () => { cr = null; });
+  window.addEventListener('scroll', () => { cr = null; rects = null; }, { passive: true });
+}
+
 /* ------------------------------------------------------------------ */
 /* Boot                                                                 */
 /* ------------------------------------------------------------------ */
 splitHeroTitle();
 splitHeadings();
+splitWords();
 initNav();
 initReveals();
 initStats();
@@ -826,6 +1015,9 @@ initCursor();
 initMagnetic();
 initTilt();
 initParticles();
+initScrollScenes();
+initOrbit();
+initSpotlights();
 
 initScrollRestore();
 initOffscreenPause();
