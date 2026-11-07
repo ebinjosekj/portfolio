@@ -107,7 +107,7 @@ void main(){
     float minGlass = 1e3;
     bool hit = false;
     vec3 p;
-    for (int i = 0; i < 72; i++) {
+    for (int i = 0; i < 56; i++) {
       p = ro + rd * t;
       float g = glass(p);
       minGlass = min(minGlass, g);
@@ -115,7 +115,7 @@ void main(){
       minRing = min(minRing, r);
       float d = min(g, r);
       if (g < 0.0015) { hit = true; break; }
-      t += max(d * 0.9, 0.004);
+      t += max(d, 0.006);
       if (t > tMax) break;
     }
 
@@ -142,12 +142,12 @@ void main(){
       float ti = 0.0;
       bool hitIn = false;
       float glow = 0.0;
-      for (int i = 0; i < 44; i++) {
+      for (int i = 0; i < 32; i++) {
         vec3 ip = q + rd2 * ti;
         float d = inner(ip);
         glow += exp(-d * 14.0) * 0.018;
         if (d < 0.002) { hitIn = true; q = ip; break; }
-        ti += d * 0.95;
+        ti += max(d, 0.004);
         if (ti > 2.1) break;
       }
 
@@ -180,141 +180,164 @@ void main(){
 }
 `;
 
-export function initHeroGL(canvas, { reduce = false, hero } = {}) {
+export function initHeroGL(canvas, { reduce = false, hero, onFirstFrame } = {}) {
   let gl;
   try {
-    gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance' });
+    gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true, depth: false, stencil: false, powerPreference: 'high-performance', desynchronized: true });
   } catch (e) { gl = null; }
-  if (!gl) return false;
+  if (!gl) return Promise.resolve(false);
 
-  const compile = (type, src) => {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; }
-    return s;
-  };
-  const vs = compile(gl.VERTEX_SHADER, VERT);
-  const fs = compile(gl.FRAGMENT_SHADER, FRAG);
-  if (!vs || !fs) return false;
+  const vs = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vs, VERT);
+  gl.compileShader(vs);
+  const fs = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fs, FRAG);
+  gl.compileShader(fs);
   const prog = gl.createProgram();
   gl.attachShader(prog, vs);
   gl.attachShader(prog, fs);
   gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
-  gl.useProgram(prog);
 
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  const loc = gl.getAttribLocation(prog, 'aPos');
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  // Compile off the main thread where supported, so the intro never stalls
+  const parallel = gl.getExtension('KHR_parallel_shader_compile');
+  const ready = new Promise((resolve) => {
+    if (!parallel) { resolve(); return; }
+    const poll = () => (gl.getProgramParameter(prog, parallel.COMPLETION_STATUS_KHR) ? resolve() : setTimeout(poll, 30));
+    poll();
+  });
 
-  const u = {};
-  ['uRes', 'uTime', 'uRot', 'uCenter', 'uScale'].forEach((n) => { u[n] = gl.getUniformLocation(prog, n); });
-
-  const isMobile = () => window.innerWidth < 760;
-  let quality = isMobile() ? 0.55 : 0.8;
-  let w = 0, h = 0;
-
-  const resize = () => {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const rect = canvas.getBoundingClientRect();
-    w = Math.max(1, Math.round(rect.width * dpr * quality));
-    h = Math.max(1, Math.round(rect.height * dpr * quality));
-    canvas.width = w;
-    canvas.height = h;
-    gl.viewport(0, 0, w, h);
-  };
-  resize();
-
-  // Pointer → rotation / parallax (eased)
-  const target = { x: 0, y: 0 };
-  const cur = { x: 0, y: 0 };
-  const onMove = (e) => {
-    target.x = (e.clientX / window.innerWidth) * 2 - 1;
-    target.y = (e.clientY / window.innerHeight) * 2 - 1;
-  };
-  window.addEventListener('pointermove', onMove, { passive: true });
-
-  // Gentle device tilt on touch devices (no permission prompts: only where available freely)
-  const onTilt = (e) => {
-    if (e.gamma == null) return;
-    target.x = Math.max(-1, Math.min(1, e.gamma / 30));
-    target.y = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
-  };
-  if (isMobile()) window.addEventListener('deviceorientation', onTilt, { passive: true });
-
-  let running = false;
-  let raf = 0;
-  let last = performance.now();
-  let time = 8.0;
-  let samples = [];
-  let failed = false;
-
-  const draw = (now) => {
-    const dt = Math.min((now - last) / 1000, 0.05);
-    last = now;
-    time += dt;
-
-    cur.x += (target.x - cur.x) * 0.045;
-    cur.y += (target.y - cur.y) * 0.045;
-
-    const mobile = isMobile();
-    const cx = mobile ? 0.5 : 0.73;
-    const cy = mobile ? 0.76 : 0.47;
-    const scrollFade = hero ? Math.min(window.scrollY / (hero.offsetHeight || 1), 1) : 0;
-
-    gl.uniform2f(u.uRes, w, h);
-    gl.uniform1f(u.uTime, time);
-    gl.uniform2f(u.uRot, time * 0.12 + cur.x * 0.6, cur.y * 0.35);
-    gl.uniform2f(u.uCenter, cx + cur.x * 0.012, cy - cur.y * 0.012 + scrollFade * 0.08);
-    gl.uniform1f(u.uScale, (mobile ? 0.56 : 0.5) * (1 - scrollFade * 0.12));
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-  };
-
-  const loop = (now) => {
-    const t0 = performance.now();
-    draw(now);
-    raf = requestAnimationFrame(loop);
-    // Adaptive quality from measured frame intervals (first ~2s)
-    if (samples.length < 120) {
-      samples.push(now);
-      if (samples.length === 120) {
-        const avg = (samples[119] - samples[0]) / 119;
-        if (avg > 26 && quality > 0.4) { quality = 0.4; resize(); samples = []; }
-        else if (avg > 26) { failed = true; }
-      }
+  return ready.then(() => {
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.warn(gl.getShaderInfoLog(fs) || gl.getProgramInfoLog(prog));
+      return false;
     }
-    void t0;
-    if (failed) { stop(); canvas.dispatchEvent(new CustomEvent('gl-fallback')); }
-  };
+    setup();
+    return true;
+  });
 
-  const start = () => {
-    if (running || reduce || failed) return;
-    running = true;
-    last = performance.now();
-    raf = requestAnimationFrame(loop);
-  };
-  const stop = () => { running = false; cancelAnimationFrame(raf); };
+  function setup() {
+    gl.useProgram(prog);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
-  if (reduce) {
-    draw(performance.now());
-  } else {
-    if (hero && 'IntersectionObserver' in window) {
-      new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(hero);
-    } else start();
-    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+    const u = {};
+    ['uRes', 'uTime', 'uRot', 'uCenter', 'uScale'].forEach((n) => { u[n] = gl.getUniformLocation(prog, n); });
+
+    const isMobile = () => window.innerWidth < 760;
+    // Render-resolution scale (1 = CSS pixels). Bounded by a pixel budget, then adapted live.
+    let maxScale = 1;
+    let scale = 1;
+    let w = 0, h = 0, cssW = 0, cssH = 0;
+
+    const computeMax = () => {
+      const rect = canvas.getBoundingClientRect();
+      cssW = rect.width; cssH = rect.height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const budget = isMobile() ? 260000 : 720000;
+      maxScale = Math.min(dpr, Math.sqrt(budget / Math.max(1, cssW * cssH)));
+    };
+    const applySize = () => {
+      w = Math.max(1, Math.round(cssW * scale));
+      h = Math.max(1, Math.round(cssH * scale));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w; canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    };
+    computeMax();
+    scale = maxScale * (isMobile() ? 0.85 : 0.9);
+    applySize();
+
+    const target = { x: 0, y: 0 };
+    const cur = { x: 0, y: 0 };
+    window.addEventListener('pointermove', (e) => {
+      target.x = (e.clientX / window.innerWidth) * 2 - 1;
+      target.y = (e.clientY / window.innerHeight) * 2 - 1;
+    }, { passive: true });
+
+    let scrollFade = 0;
+    const onScroll = () => { scrollFade = hero ? Math.min(window.scrollY / (hero.offsetHeight || 1), 1) : 0; };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    let running = false;
+    let raf = 0;
+    let last = 0;
+    let time = 8.0;
+    let ema = 16.7;
+    let slowFor = 0;
+    let fastFor = 0;
+    let warm = 0;
+
+    const draw = (dt) => {
+      time += dt;
+      cur.x += (target.x - cur.x) * Math.min(1, dt * 3);
+      cur.y += (target.y - cur.y) * Math.min(1, dt * 3);
+      const mobile = isMobile();
+      gl.uniform2f(u.uRes, w, h);
+      gl.uniform1f(u.uTime, time);
+      gl.uniform2f(u.uRot, time * 0.12 + cur.x * 0.6, cur.y * 0.35);
+      gl.uniform2f(u.uCenter, (mobile ? 0.5 : 0.73) + cur.x * 0.012, (mobile ? 0.76 : 0.47) - cur.y * 0.012 + scrollFade * 0.08);
+      gl.uniform1f(u.uScale, (mobile ? 0.56 : 0.5) * (1 - scrollFade * 0.12));
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+
+    const adapt = (frameMs, dt) => {
+      if (warm < 20) { warm += 1; return; } // ignore start-up frames
+      ema += (frameMs - ema) * 0.1;
+      if (ema > 21) { slowFor += dt; fastFor = 0; } else if (ema < 17.5) { fastFor += dt; slowFor = 0; } else { slowFor = 0; fastFor = 0; }
+      if (slowFor > 0.5) {
+        slowFor = 0;
+        const min = maxScale * 0.5;
+        if (scale > min + 0.01) { scale = Math.max(min, scale * 0.8); applySize(); ema = 16.7; warm = 10; }
+        else { stop(); canvas.dispatchEvent(new CustomEvent('gl-fallback')); }
+      } else if (fastFor > 3 && scale < maxScale * 0.9) {
+        fastFor = 0;
+        scale = Math.min(maxScale * 0.9, scale * 1.1); applySize(); warm = 10;
+      }
+    };
+
+    const loop = (now) => {
+      raf = requestAnimationFrame(loop);
+      const frameMs = last ? now - last : 16.7;
+      last = now;
+      const dt = Math.min(frameMs / 1000, 0.05);
+      draw(dt);
+      adapt(frameMs, dt);
+    };
+
+    function start() {
+      if (running || reduce) return;
+      running = true;
+      last = 0;
+      raf = requestAnimationFrame(loop);
+    }
+    function stop() { running = false; cancelAnimationFrame(raf); }
+
+    draw(0);
+    if (onFirstFrame) onFirstFrame();
+
+    if (!reduce) {
+      let heroVisible = true;
+      if (hero && 'IntersectionObserver' in window) {
+        new IntersectionObserver(([entry]) => {
+          heroVisible = entry.isIntersecting;
+          if (heroVisible && !document.hidden) start(); else stop();
+        }).observe(hero);
+      } else start();
+      document.addEventListener('visibilitychange', () => (document.hidden || !heroVisible ? stop() : start()));
+    }
+
+    let rt;
+    window.addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => { computeMax(); scale = Math.min(scale, maxScale); applySize(); if (reduce) draw(0); }, 150);
+    }, { passive: true });
+
+    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); canvas.dispatchEvent(new CustomEvent('gl-fallback')); });
   }
-
-  let rt;
-  window.addEventListener('resize', () => {
-    clearTimeout(rt);
-    rt = setTimeout(() => { resize(); if (reduce) draw(performance.now()); }, 120);
-  }, { passive: true });
-
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); canvas.dispatchEvent(new CustomEvent('gl-fallback')); });
-
-  return true;
 }
