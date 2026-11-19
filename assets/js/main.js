@@ -54,8 +54,8 @@ function runPreloader() {
     if (reduce || !el) { resolve(); return; }
 
     const isReturn = root.classList.contains('is-return');
-    const minTime = isReturn ? 400 : 1100;
-    const maxTime = isReturn ? 1000 : 2400;
+    const minTime = isReturn ? 0 : 380;
+    const maxTime = isReturn ? 450 : 900;
     root.classList.add('is-loading');
 
     const bar = $('.preloader__bar', el);
@@ -79,15 +79,15 @@ function runPreloader() {
         root.classList.remove('is-loading');
         try { sessionStorage.setItem('ej-visited', '1'); } catch (e) { /* storage unavailable */ }
         resolve();
-        setTimeout(() => el.remove(), 900);
-      }, 220);
+        setTimeout(() => el.remove(), 500);
+      }, 60);
     };
     const tick = (now) => {
       if (finished) return;
       const t = now - start;
       const ready = loaded === tasks.length || t > maxTime;
       if (ready && t >= minTime) { finish(); return; }
-      const p = 1 - Math.pow(1 - Math.min(1, t / minTime), 3);
+      const p = 1 - Math.pow(1 - Math.min(1, t / Math.max(minTime, 1)), 3);
       const shown = p * (ready ? 0.96 : 0.88);
       bar.style.setProperty('--p', shown.toFixed(3));
       count.textContent = Math.round(shown * 100);
@@ -198,18 +198,24 @@ function initReveals() {
     if (el.dataset.reveal === 'stagger') $$(':scope > *', el).forEach((c, i) => c.style.setProperty('--si', i));
     const sibs = $$(':scope > [data-reveal]', el.parentElement);
     const idx = sibs.indexOf(el);
-    if (idx > 0 && el.dataset.reveal !== 'heading') el.style.setProperty('--rd', `${Math.min(idx, 5) * 0.08}s`);
+    if (idx > 0 && el.dataset.reveal !== 'heading') el.style.setProperty('--rd', `${Math.min(idx, 3) * 0.05}s`);
   });
 
   if (reduce || !('IntersectionObserver' in window)) { els.forEach((el) => el.classList.add('is-in')); return; }
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add('is-in');
-      e.target.dispatchEvent(new CustomEvent('reveal'));
-      io.unobserve(e.target);
+      const el = e.target;
+      if (e.isIntersecting) {
+        if (!el.classList.contains('is-in')) {
+          el.classList.add('is-in');
+          if (!el._revealed) { el._revealed = true; el.dispatchEvent(new CustomEvent('reveal')); }
+        }
+      } else if (e.boundingClientRect.top > window.innerHeight && el.dataset.revealOnce === undefined) {
+        // Left through the bottom (scrolling back up): reset so it animates again next time
+        el.classList.remove('is-in');
+      }
     });
-  }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px 4% 0px' });
   els.forEach((el) => io.observe(el));
 }
 
@@ -275,6 +281,9 @@ function initCursor() {
   document.addEventListener('pointerenter', () => cursor.classList.remove('is-hidden'));
 
   const hoverSel = 'a, button, summary, [data-magnetic], .work__preview, .tnode';
+  document.addEventListener('pointerover', (e) => cursor.classList.toggle('is-view', !!e.target.closest('.work__preview')));
+  window.addEventListener('pointerdown', () => cursor.classList.add('is-down'));
+  window.addEventListener('pointerup', () => cursor.classList.remove('is-down'));
   document.addEventListener('pointerover', (e) => { if (e.target.closest(hoverSel)) cursor.classList.add('is-hover'); });
   document.addEventListener('pointerout', (e) => { if (e.target.closest(hoverSel) && !e.relatedTarget?.closest?.(hoverSel)) cursor.classList.remove('is-hover'); });
 
@@ -998,12 +1007,133 @@ function initSpotlights() {
   window.addEventListener('scroll', () => { cr = null; rects = null; }, { passive: true });
 }
 
+
+/* ------------------------------------------------------------------ */
+/* Motion layer 2                                                       */
+/* ------------------------------------------------------------------ */
+function initRotator() {
+  const el = $('[data-rotator]');
+  if (!el || reduce) return;
+  const words = el.dataset.rotator.split('|');
+  let wi = 0, ci = words[0].length, deleting = false;
+  const tick = () => {
+    const word = words[wi];
+    if (!deleting && ci === word.length) { deleting = true; setTimeout(tick, 1900); return; }
+    if (deleting && ci === 0) { deleting = false; wi = (wi + 1) % words.length; }
+    ci += deleting ? -1 : 1;
+    el.textContent = words[wi].slice(0, ci);
+    setTimeout(tick, deleting ? 28 : 55);
+  };
+  setTimeout(tick, 1200);
+}
+
+function initHeroPlay() {
+  if (reduce) return;
+  const title = $('[data-split]');
+  const hero = $('#home');
+  if (!title || !hero) return;
+  const bounce = (c) => {
+    if (!root.classList.contains('is-settled') || c.classList.contains('is-bounce')) return;
+    c.classList.add('is-bounce');
+    c.addEventListener('animationend', () => c.classList.remove('is-bounce'), { once: true });
+  };
+  title.addEventListener('pointerover', (e) => { const c = e.target.closest('.char'); if (c) bounce(c); });
+  title.addEventListener('touchstart', (e) => { const c = e.target.closest('.char'); if (c) bounce(c); }, { passive: true });
+  // Wave through the letters once the intro settles
+  setTimeout(() => $$('.char', title).forEach((c, i) => setTimeout(() => bounce(c), i * 35)), 1500);
+  if (!finePointer) return;
+  hero.addEventListener('pointermove', (e) => {
+    const x = e.clientX / window.innerWidth - 0.5;
+    const y = e.clientY / window.innerHeight - 0.5;
+    title.style.setProperty('--hx', `${(x * 8).toFixed(2)}deg`);
+    title.style.setProperty('--hy', `${(-y * 6).toFixed(2)}deg`);
+  }, { passive: true });
+  hero.addEventListener('pointerleave', () => { title.style.setProperty('--hx', '0deg'); title.style.setProperty('--hy', '0deg'); });
+}
+
+function initNavRoll() {
+  $$('.nav__links a, .footer__top, .menu__foot a').forEach((a) => {
+    const t = a.textContent.trim();
+    a.innerHTML = `<span class="roll"><span data-text="${t}">${t}</span></span>`;
+  });
+}
+
+function initRipple() {
+  if (reduce) return;
+  document.addEventListener('pointerdown', (e) => {
+    const el = e.target.closest('.btn, .tech__filters button, .work__open, .contact__email, .nav__cta, .footer__top');
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const d = Math.max(r.width, r.height) * 2.2;
+    const s = document.createElement('span');
+    s.className = 'ripple';
+    s.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+    el.appendChild(s);
+    s.addEventListener('animationend', () => s.remove(), { once: true });
+  });
+}
+
+function initHoverTilt() {
+  if (!finePointer || reduce) return;
+  $$('[data-hover-tilt]').forEach((card) => {
+    const glare = document.createElement('span');
+    glare.className = 'tilt-glare';
+    glare.setAttribute('aria-hidden', 'true');
+    card.appendChild(glare);
+    let r = null;
+    card.addEventListener('pointerenter', () => { r = card.getBoundingClientRect(); card.classList.add('is-tilting'); });
+    card.addEventListener('pointermove', (e) => {
+      if (!r) r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      card.style.setProperty('--try', `${((x - 0.5) * 8).toFixed(2)}deg`);
+      card.style.setProperty('--trx', `${(-(y - 0.5) * 8).toFixed(2)}deg`);
+      card.style.setProperty('--gx', `${(x * 100).toFixed(1)}%`);
+      card.style.setProperty('--gy', `${(y * 100).toFixed(1)}%`);
+    });
+    card.addEventListener('pointerleave', () => {
+      r = null;
+      card.classList.remove('is-tilting');
+      card.style.setProperty('--try', '0deg');
+      card.style.setProperty('--trx', '0deg');
+    });
+  });
+}
+
+/* Scroll velocity drives ticker speed + skew; portrait zooms with scroll */
+function initVelocity() {
+  if (reduce) return;
+  const tracks = $$('.ticker__track');
+  const portrait = $('.portrait img');
+  const visual = $('.about__visual');
+  let lastY = window.scrollY, vel = 0, raf = 0;
+  const loop = () => {
+    const y = window.scrollY;
+    const dy = y - lastY;
+    lastY = y;
+    vel = lerp(vel, clamp(dy, -60, 60), 0.18);
+    root.style.setProperty('--vel', (vel / 6).toFixed(2));
+    const rate = 1 + Math.abs(vel) / 6;
+    tracks.forEach((t) => t.getAnimations().forEach((a) => { a.playbackRate = rate; }));
+    if (portrait && visual) {
+      const r = visual.getBoundingClientRect();
+      const p = clamp(1 - (r.top + r.height / 2) / window.innerHeight, 0, 1);
+      portrait.style.setProperty('--pz', (1.18 - p * 0.18).toFixed(3));
+    }
+    if (Math.abs(vel) > 0.05 || dy !== 0) raf = requestAnimationFrame(loop);
+    else { raf = 0; root.style.setProperty('--vel', '0'); tracks.forEach((t) => t.getAnimations().forEach((a) => { a.playbackRate = 1; })); }
+  };
+  window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(loop); }, { passive: true });
+  loop();
+}
+
 /* ------------------------------------------------------------------ */
 /* Boot                                                                 */
 /* ------------------------------------------------------------------ */
 splitHeroTitle();
 splitHeadings();
 splitWords();
+initNavRoll();
 initNav();
 initReveals();
 initStats();
@@ -1018,14 +1148,20 @@ initParticles();
 initScrollScenes();
 initOrbit();
 initSpotlights();
+initRotator();
+initHeroPlay();
+initRipple();
+initHoverTilt();
+initVelocity();
 
 initScrollRestore();
 initOffscreenPause();
 // Start compiling the 3D scene while the preloader runs, so the intro never stalls
 const scene = initHeroScene();
-Promise.all([runPreloader(), Promise.race([scene, new Promise((r) => setTimeout(r, 1500))])]).then(() => {
+// Don't hold the intro for the 3D scene: it fades in on its own once compiled
+runPreloader().then(() => {
   requestAnimationFrame(() => {
     root.classList.add('is-ready');
-    setTimeout(() => root.classList.add('is-settled'), 2600);
+    setTimeout(() => root.classList.add('is-settled'), 1400);
   });
 });
