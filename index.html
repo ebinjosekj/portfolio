@@ -149,7 +149,7 @@
     </div>
 
     <div class="hero__content shell" data-hero-content>
-      <p class="hero__role" data-intro="1">Full Stack Developer</p>
+      <p class="hero__role" data-intro="1"><span class="sr-only">Full Stack Developer</span><span class="hero__rotator" aria-hidden="true" data-rotator="Full Stack Developer|.NET &amp; C# Engineer|Angular &amp; React Builder|Azure Cloud Developer">Full Stack Developer</span><span class="hero__caret" aria-hidden="true"></span></p>
       <h1 class="hero__title" id="hero-title" data-split>
         <span class="line">Building</span>
         <span class="line">Digital</span>
@@ -163,7 +163,7 @@
         <a href="#projects" class="btn btn--primary" data-magnetic><span>Explore my work</span></a>
         <a href="#contact" class="btn btn--ghost" data-magnetic><span>Let’s talk</span></a>
       </div>
-      <ul class="hero__meta" data-intro="4" aria-label="At a glance">
+      <ul class="hero__meta" data-intro="4" data-meta aria-label="At a glance">
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>Canada</li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>5+ Years Experience</li>
         <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/></svg>Software Developer</li>
@@ -191,25 +191,25 @@
           <p class="about__intro" data-words>
             I’m a Full Stack Developer with over 5 years of experience building enterprise and web-based applications.
           </p>
-          <p data-reveal>
+          <p data-reveal="blur">
             My core expertise is in the .NET ecosystem, with hands-on experience across backend development,
             frontend technologies, databases, cloud platforms and CI/CD.
           </p>
-          <p data-reveal>
+          <p data-reveal="blur">
             From municipal systems to enterprise insurance applications, I have worked on different types of
             software and collaborated with teams across the full development lifecycle.
           </p>
         </div>
 
-        <div class="about__visual" data-tilt data-reveal aria-hidden="true">
+        <div class="about__visual" data-tilt data-reveal="scale">
           <div class="portrait" data-portrait>
             <picture>
-              <source type="image/webp" srcset="assets/img/ebin-portrait-720.webp 720w, assets/img/ebin-portrait-1080.webp 1080w" sizes="(max-width: 860px) 80vw, 420px">
-              <img src="assets/img/ebin-portrait-720.jpg" srcset="assets/img/ebin-portrait-720.jpg 720w, assets/img/ebin-portrait-1080.jpg 1080w" sizes="(max-width: 860px) 80vw, 420px" width="720" height="994" alt="" loading="lazy" decoding="async">
+              <source type="image/webp" srcset="assets/img/ebin-portrait-720.webp 720w, assets/img/ebin-portrait-934.webp 934w" sizes="(max-width: 860px) 80vw, 420px">
+              <img src="assets/img/ebin-portrait-720.jpg" srcset="assets/img/ebin-portrait-720.jpg 720w, assets/img/ebin-portrait-934.jpg 934w" sizes="(max-width: 860px) 80vw, 420px" width="720" height="967" alt="Portrait of Ebin Jose" loading="eager" decoding="async">
             </picture>
           </div>
           <span class="portrait__scan" aria-hidden="true"></span>
-          <ul class="orbit" data-orbit>
+          <ul class="orbit" data-orbit aria-hidden="true">
             <li><img src="assets/icons/csharp.svg" alt="" width="22" height="22" loading="lazy">C#</li>
             <li><img src="assets/icons/dotnetcore.svg" alt="" width="22" height="22" loading="lazy">.NET</li>
             <li><img src="assets/icons/angular.svg" alt="" width="22" height="22" loading="lazy">Angular</li>
@@ -249,8 +249,8 @@
       <div class="shell tech" data-tech>
         <div class="tech__side">
           <h2 class="heading heading--md" id="expertise-title" data-reveal="heading">The technologies<br>behind the<br>solutions.</h2>
-          <p class="section-lead" data-reveal>Hover or tap a technology to see how it fits into my work, or filter by area.</p>
-          <div class="tech__filters" role="group" aria-label="Filter technologies by area" data-reveal>
+          <p class="section-lead" data-reveal="blur">Hover or tap a technology to see how it fits into my work, or filter by area.</p>
+          <div class="tech__filters" role="group" aria-label="Filter technologies by area" data-reveal="stagger">
             <button type="button" aria-pressed="true" data-filter="all">All</button>
             <button type="button" aria-pressed="false" data-filter="backend">Backend</button>
             <button type="button" aria-pressed="false" data-filter="frontend">Frontend</button>
@@ -261,7 +261,7 @@
             <button type="button" aria-pressed="false" data-filter="testing">Testing</button>
             <button type="button" aria-pressed="false" data-filter="agile">Agile</button>
           </div>
-          <aside class="tech__info" aria-live="polite" data-tech-info data-reveal>
+          <aside class="tech__info" aria-live="polite" data-tech-info data-reveal="scale" data-hover-tilt>
             <p class="tech__info-cat" data-info-cat>Ecosystem</p>
             <h3 class="tech__info-name" data-info-name>36 technologies, one connected stack</h3>
             <p class="tech__info-desc" data-info-desc>Centred on .NET and C#, reaching from the database to the browser and out to the cloud. Choose any technology to see what it connects to.</p>
@@ -445,7 +445,7 @@
     <section class="section projects" id="projects" aria-labelledby="projects-title">
       <div class="shell section-head">
         <h2 class="heading" id="projects-title" data-reveal="heading">Selected<br>work.</h2>
-        <p class="section-lead" data-reveal>
+        <p class="section-lead" data-reveal="blur">
           The previews below are concept illustrations I designed for this site, not screenshots of production systems.
           The real applications belong to the organizations I built them for.
         </p>
@@ -475,11 +475,11 @@
             </div>
             <span class="work__badge">Concept illustration</span>
           </div>
-          <div class="work__info">
+          <div class="work__info" data-reveal="side">
             <p class="work__index">Project 01</p>
             <h3 class="work__title">Water &amp; Waste Management System</h3>
             <p class="work__desc">A municipal system supporting water and waste management operations, reporting and data tracking.</p>
-            <ul class="tags"><li>Angular</li><li>.NET Core</li><li>Azure SQL</li></ul>
+            <ul class="tags" data-reveal="stagger"><li>Angular</li><li>.NET Core</li><li>Azure SQL</li></ul>
             <button type="button" class="work__open" data-open-work>View project details</button>
           </div>
           <div class="work__detail" hidden>
@@ -514,11 +514,11 @@
             </div>
             <span class="work__badge">Concept illustration</span>
           </div>
-          <div class="work__info">
+          <div class="work__info" data-reveal="side">
             <p class="work__index">Project 02</p>
             <h3 class="work__title">Insurance Management Tool</h3>
             <p class="work__desc">An internal enterprise tool designed for insurance firms to manage plan revisions, updates and projections.</p>
-            <ul class="tags"><li>ASP.NET MVC</li><li>C#</li><li>SQL Server</li></ul>
+            <ul class="tags" data-reveal="stagger"><li>ASP.NET MVC</li><li>C#</li><li>SQL Server</li></ul>
             <button type="button" class="work__open" data-open-work>View project details</button>
           </div>
           <div class="work__detail" hidden>
@@ -557,11 +557,11 @@
             </div>
             <span class="work__badge">Concept illustration</span>
           </div>
-          <div class="work__info">
+          <div class="work__info" data-reveal="side">
             <p class="work__index">Project 03</p>
             <h3 class="work__title">Customer-Vendor Platform</h3>
             <p class="work__desc">A full-stack platform connecting customers and vendors through a responsive web application.</p>
-            <ul class="tags"><li>Angular</li><li>.NET API</li><li>Azure</li></ul>
+            <ul class="tags" data-reveal="stagger"><li>Angular</li><li>.NET API</li><li>Azure</li></ul>
             <button type="button" class="work__open" data-open-work>View project details</button>
           </div>
           <div class="work__detail" hidden>
@@ -578,13 +578,13 @@
       <div class="shell edu">
         <h2 class="heading heading--md" id="education-title" data-reveal="heading">The<br>foundation.</h2>
         <ol class="edu__list">
-          <li class="edu__item" data-reveal>
+          <li class="edu__item" data-reveal="left" data-hover-tilt>
             <span class="edu__ghost" aria-hidden="true" data-parallax="-0.12">2023</span>
             <p class="edu__years"><time datetime="2022-05">May 2022</time> – <time datetime="2023-08">Aug 2023</time></p>
             <h3 class="edu__school">Conestoga College</h3>
             <p class="edu__program">Post Graduate Diploma in Web Development</p>
           </li>
-          <li class="edu__item" data-reveal>
+          <li class="edu__item" data-reveal="left" data-hover-tilt>
             <span class="edu__ghost" aria-hidden="true" data-parallax="-0.12">2018</span>
             <p class="edu__years"><time datetime="2014">2014</time> – <time datetime="2018">2018</time></p>
             <h3 class="edu__school">Mahatma Gandhi University</h3>
@@ -606,8 +606,8 @@
       </div>
       <div class="shell contact__inner">
         <h2 class="contact__title" id="contact-title" data-reveal="heading">Let’s build<br>something great.</h2>
-        <p class="contact__lead" data-reveal>Have an opportunity, project or idea? I would love to hear from you.</p>
-        <div class="contact__actions" data-reveal>
+        <p class="contact__lead" data-reveal="blur">Have an opportunity, project or idea? I would love to hear from you.</p>
+        <div class="contact__actions" data-reveal="scale">
           <a class="contact__email" href="mailto:ebinjosekj@gmail.com" data-magnetic>
             <span>ebinjosekj@gmail.com</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
@@ -626,7 +626,7 @@
   </main>
 
   <footer class="footer">
-    <div class="shell footer__inner">
+    <div class="shell footer__inner" data-reveal="stagger">
       <div>
         <p class="footer__name">Ebin Jose</p>
         <p>Full Stack Developer · Canada</p>
